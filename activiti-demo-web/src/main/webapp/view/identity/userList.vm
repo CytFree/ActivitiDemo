@@ -1,0 +1,199 @@
+<html>
+<head>
+    <link rel="stylesheet" href="${www.contextPath}/assets/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="${www.contextPath}/assets/bootstrap-table/css/bootstrap-table.min.css">
+</head>
+<body>
+<div id="toolBar">
+    <button class="btn btn-info" data-toggle="modal" data-target="#myModal"><span
+            class="glyphicon glyphicon-plus"></span>新增
+    </button>
+</div>
+
+<div style="width: 98%; margin: auto">
+    <table id="userListTable"
+    </table>
+</div>
+
+<!-- 模态框（Modal） -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title" id="myModalLabel">新增用户</h4>
+            </div>
+            <div class="modal-body">
+                <form class="form-horizontal" role="form" id="addUserForm">
+                    <div class="form-group">
+                        <label for="id" class="control-label">登录名</label>
+                        <input type="text" name="id" placeholder="登录名..." class="id form-control" id="id">
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label" for="password">密码</label>
+                        <input type="password" name="password" placeholder="密码..." class="password form-control"
+                               id="password">
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label" for="firstName">姓</label>
+                        <input type="text" name="firstName" placeholder="姓..." class="form-control"
+                               id="firstName">
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label" for="firstName">名</label>
+                        <input type="text" name="lastName" placeholder="名..." class="form-control"
+                               id="lastName">
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label" for="email">邮箱</label>
+                        <input type="text" name="email" placeholder="邮箱..." class="form-control"
+                               id="email">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                <button type="button" class="btn btn-primary" id="addUserBtn">提交</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal -->
+</div>
+
+<script src="${www.contextPath}/assets/js/jquery-1.11.1.min.js"></script>
+<script src="${www.contextPath}/assets/bootstrap/js/bootstrap.min.js"></script>
+<script src="${www.contextPath}/assets/bootstrap-table/js/bootstrap-table.min.js"></script>
+<script src="${www.contextPath}/assets/bootstrap-table/js/bootstrap-table-zh-CN.min.js"></script>
+
+<script type="text/javascript">
+    $(function () {
+        //根据窗口大小调整table大小
+        $(window).resize(function () {
+            $('#userListTable').bootstrapTable('resetView', {
+                height: tableHeight()
+            })
+        });
+
+        $("#userListTable").bootstrapTable({
+            method: 'post',
+            contentType: "application/x-www-form-urlencoded",//必须要有！！！！
+            url: "userList.htm",
+            height: tableHeight(),//高度调整
+            striped: true, //是否显示行间隔色
+            pageNumber: 1, //初始化加载第一页，默认第一页
+            pagination: true,//是否分页
+            queryParams: queryParams,//请求服务器时所传的参数
+            sidePagination: 'server',//指定服务器端分页
+            pageSize: 5,//单页记录数
+            pageList: [5, 10, 20, 30],//分页步进值
+            showColumns: true,//是否显示内容列下拉框
+            showRefresh: true,//是否显示刷新按钮
+            clickToSelect: true,//是否启用点击选中行
+//            toolbarAlign:'right',//工具栏对齐方式
+            buttonsAlign: 'right',//按钮对齐方式
+//            toolbar:'#toolbar',//指定工作栏
+            locale: 'zh-CN',//中文支持,
+            toolbar: "#toolBar",
+            columns: [
+                {
+                    title: '用户ID',
+                    field: 'id',
+                },
+                {
+                    title: '用户姓名',
+                    field: 'lastName',
+                    //列数据格式化
+                    formatter: operateNameFormatter
+                },
+                {
+                    title: '邮箱',
+                    field: 'email'
+                },
+                {
+                    title: '用户组'
+                },
+                {
+                    title: '操作',
+                    width: 200,
+                    formatter: operateFormatter
+                }
+            ],
+            rowStyle: function (row, index) {
+                var classes = ['success', 'info', 'warning', 'danger'];
+                if (index % 2 === 0) {
+                    return {};
+                }
+                var eg = index % 5;
+                return {
+                    classes: classes[eg]
+                };
+            }
+        });
+    });
+
+    //请求服务数据时所传参数
+    function queryParams(params) {
+        return {
+            //每页多少条数据
+            pageSize: params.limit,
+            //请求第几页
+            pageStartIndex: params.offset
+        }
+    }
+
+    /**
+     * tableHeight函数
+     * @returns {number}
+     */
+    function tableHeight() {
+        //可以根据自己页面情况进行调整
+        return $(window).height() - 180;
+    }
+
+    function operateNameFormatter(value, row, index) {
+        if (typeof(row["firstName"]) != "undefined") {
+            return row["firstName"] + (typeof(value) == "undefined" ? "-" : value);
+        }
+        return value;
+    }
+
+    function operateFormatter(value, row, index) {
+        var id = row["id"];
+        var html = "<button class='btn btn-primary' onclick=editUser('" + id + "')>修改</button>";
+        html += "<button style='margin-left: 10px;' class='btn btn-danger' onclick=deleteUser('" + id + "')>删除</button>";
+        return html;
+    }
+
+    function editUser(id) {
+        alert("修改id=" + id);
+    }
+
+    function deleteUser(id) {
+        alert("删除id=" + id);
+    }
+
+    /**
+     * 提交登录表单
+     */
+    $("#addUserBtn").on("click", function () {
+        var param = $("#addUserForm").serialize();
+        $.ajax({
+            url: "saveUser.htm",
+            dataType: "json",
+            type: "POST",
+            data: param,
+            success: function (data) {
+                if (data.webResponse == "SUCCESS") {
+                    alert("用户添加成功");
+                    $("#myModal").modal("hide");
+                    $("#userListTable").bootstrapTable("refresh");
+                } else {
+                    alert(data.errorMsg);
+                    $("#myModal").modal("hide");
+                }
+            }
+        });
+    });
+</script>
+
+</body>
+</html>
