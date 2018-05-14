@@ -1,0 +1,56 @@
+<link rel="stylesheet" href="${www.contextPath}/assets/bootstrap/css/bootstrap.min.css">
+
+<div style="width: 95%;margin: auto; margin-top: 30px;">
+    <table class="table table-bordered">
+        <caption>已完成签约流程</caption>
+        <tr>
+            <th>签约流程号</th>
+            <th>会员ID</th>
+            <th>状态</th>
+            <th>申请人</th>
+            <th>流程创建时间</th>
+            <th>流程完成时间</th>
+            <th>当前节点</th>
+        </tr>
+		#if($rows && $rows.size() > 0)
+			#foreach($row in $rows)
+                <tr>
+                    <td>$!row.processId</td>
+                    <td>$!row.memberId</td>
+                    <td>$!row.auditStatus</td>
+                    <td>$!row.applyUserId</td>
+                    <td>$!row.historicProcessInstance.startTime</td>
+                    <td>$!row.historicProcessInstance.endTime</td>
+                    <td>
+                        <a target="_blank" href='javascript:void(0);' pid="$!{row.historicProcessInstance.processInstanceId}"
+                           pdid="$!{row.historicProcessInstance.processDefinitionId}">查看历史</a>
+                    </td>
+                </tr>
+			#end
+		#else
+            <tr>
+                <td colspan="7" align="center" style="color: red">无运行中的签约流程</td>
+            </tr>
+		#end
+    </table>
+</div>
+
+<script src="${www.contextPath}/assets/js/jquery-1.11.1.min.js"></script>
+<script src="${www.contextPath}/assets/bootstrap/js/bootstrap.min.js"></script>
+<script src="${www.contextPath}/assets/js/activiti/workflow.js"></script>
+
+
+<script type="text/javascript">
+    $(function () {
+        // 跟踪
+        $('.trace').each(function () {
+            var e = $(this);
+            var pdid = e.attr("pdid");
+            var pid = e.attr("pid");
+            var url = "http://localhost:8090/activiti-demo-web/diagram-viewer/index.html?processDefinitionId=" + pdid + "&processInstanceId=" + pid;
+            e.attr("href", url);
+        });
+    });
+
+    var ctx = "${www.contextPath}";
+</script>

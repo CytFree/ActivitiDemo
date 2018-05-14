@@ -8,6 +8,7 @@ public enum WebResponse {
     SUCCESS("S0001", "成功"),
     SYSTEM_ERROR("F0001", "系统异常"),
     BIZ_ERROR("F0002", "业务异常"),
+    SESSION_OUT("F0009", "session失效，重新登录"),
     UNKNOW_ERROR("F9999", "未知异常"),;
 
     private final String responseCode;

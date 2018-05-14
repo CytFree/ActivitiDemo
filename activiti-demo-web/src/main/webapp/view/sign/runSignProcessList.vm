@@ -1,0 +1,86 @@
+<link rel="stylesheet" href="${www.contextPath}/assets/bootstrap/css/bootstrap.min.css">
+
+<div STYLE="margin-top: 20px;margin-left: 20px;	">
+    <a class="btn btn-info" id="addActivitiModel" title="新增Model" href="${www.contextPath}/models/newModel.htm"><span
+            class="glyphicon glyphicon-plus"></span>新增
+    </a>
+
+    <a class="btn btn-info" id="startProcess" title="开启流程实例" href="javascript:void(0);"><span
+            class="glyphicon glyphicon-book"></span>开启流程实例
+    </a>
+</div>
+
+<div style="width: 95%;margin: auto; margin-top: 30px;">
+    <table class="table table-bordered">
+        <caption>运行中的签约流程</caption>
+        <tr>
+            <th>流程类型</th>
+            <th>业务主键</th>
+            <th>任务创建时间</th>
+            <th>当前任务节点</th>
+            <th>当前处理人</th>
+        </tr>
+		#if($rows && $rows.size() > 0)
+			#foreach($row in $rows)
+                <tr>
+                    <td>$!row.processDefinitionName</td>
+                    <td>$!row.businessKey</td>
+                    <td>$!row.taskCreateTime</td>
+                    <td>
+                        <a class="trace" target="_blank" href='#' pid="$!{row.processInstanceId}"
+                           pdid="$!{row.processDefinitionId}"
+                           title="点击查看流程图">$!{row.taskName}</a>
+					</td>
+                    <td>$!row.taskAssignee</td>
+                </tr>
+			#end
+		#else
+            <tr>
+                <td colspan="7" align="center" style="color: red">无运行中的签约流程</td>
+            </tr>
+		#end
+    </table>
+</div>
+
+<script src="${www.contextPath}/assets/js/jquery-1.11.1.min.js"></script>
+<script src="${www.contextPath}/assets/bootstrap/js/bootstrap.min.js"></script>
+<script src="${www.contextPath}/assets/js/activiti/workflow.js"></script>
+
+
+<script type="text/javascript">
+    $(function () {
+        // 跟踪
+        $('.trace').each(function () {
+            var e = $(this);
+            var pdid = e.attr("pdid");
+            var pid = e.attr("pid");
+            var url = "http://localhost:8090/activiti-demo-web/diagram-viewer/index.html?processDefinitionId=" + pdid + "&processInstanceId=" + pid;
+            e.attr("href", url);
+        });
+    });
+
+    var ctx = "${www.contextPath}";
+
+    $("#startProcess").on("click", function () {
+    	var processDefinitionKey = prompt("输入要开启的流程Key");
+		if (processDefinitionKey != null && processDefinitionKey.trim() != "") {
+            processDefinitionKey = processDefinitionKey.trim();
+            $.ajax({
+                url: "${www.contextPath}/models/startProcess.htm",
+                dataType:"json",
+                type: "POST",
+                data: {'processDefinitionKey': processDefinitionKey},
+                success: function (data) {
+                    if (data.webResponse == "SUCCESS") {
+                        alert("流程【"+ processDefinitionKey +"】开始成功！");
+                    } else {
+                        alert("流程【"+ processDefinitionKey +"】开始失败！");
+                    }
+                    window.location.reload();
+                }
+            });
+		} else {
+			alert("流程Key不能为空");
+		}
+    });
+</script>

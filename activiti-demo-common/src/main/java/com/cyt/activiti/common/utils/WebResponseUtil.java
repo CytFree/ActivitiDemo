@@ -1,8 +1,8 @@
 package com.cyt.activiti.common.utils;
 
+import com.alibaba.fastjson.JSONObject;
 import com.cyt.activiti.common.constants.CodeConstant;
 import com.cyt.activiti.common.enums.WebResponse;
-import com.meidusa.fastjson.JSONObject;
 
 /**
  * Controller返回信息工具类
@@ -42,6 +42,17 @@ public class WebResponseUtil {
     public static JSONObject response(String responseCode) {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put(CodeConstant.WEB_RESPONSE, WebResponse.getByCode(responseCode));
+        return jsonObject;
+    }
+
+    /**
+     * session失效，重新登录
+     *
+     * @return
+     */
+    public static JSONObject logout() {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put(CodeConstant.WEB_RESPONSE, WebResponse.SESSION_OUT);
         return jsonObject;
     }
 }

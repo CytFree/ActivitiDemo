@@ -1,7 +1,7 @@
 package com.cyt.activiti.web.controller;
 
 
-import com.meidusa.fastjson.JSONObject;
+import com.alibaba.fastjson.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,6 +38,7 @@ public class BaseController {
             printWriter.flush();
         } catch (Exception e) {
             LOGGER.error("response 写入异常：", e);
+            e.printStackTrace();
         } finally {
             if (printWriter != null) {
                 printWriter.close();

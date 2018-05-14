@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:dubbo="http://code.alibabatech.com/schema/dubbo"
+       xsi:schemaLocation="
+			http://www.springframework.org/schema/beans
+			http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+			 http://code.alibabatech.com/schema/dubbo http://code.alibabatech.com/schema/dubbo/dubbo.xsd">
+
+    <dubbo:application name="activitiDemo" version="1.0.0"
+                       owner="activitiDemo" organization="cyt"></dubbo:application>
+
+    <dubbo:registry address="zookeeper://192.168.180.42:2181?backup=192.168.180.43:2181,192.168.180.44:2181"></dubbo:registry>
+
+    <dubbo:monitor protocol="registry"></dubbo:monitor>
+</beans>

@@ -1,0 +1,141 @@
+<html>
+<head>
+    <link rel="stylesheet" href="${www.contextPath}/assets/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="${www.contextPath}/assets/bootstrap-table/css/bootstrap-table.min.css">
+</head>
+<body>
+
+<div style="width: 98%; margin: auto">
+    <table id="groupListTable"
+    </table>
+</div>
+
+<script src="${www.contextPath}/assets/js/jquery-1.11.1.min.js"></script>
+<script src="${www.contextPath}/assets/bootstrap/js/bootstrap.min.js"></script>
+<script src="${www.contextPath}/assets/bootstrap-table/js/bootstrap-table.min.js"></script>
+<script src="${www.contextPath}/assets/bootstrap-table/js/bootstrap-table-zh-CN.min.js"></script>
+
+<script type="text/javascript">
+    $(function () {
+        //根据窗口大小调整table大小
+        $(window).resize(function () {
+            $('#groupListTable').bootstrapTable('resetView', {
+                height: tableHeight()
+            })
+        });
+
+        $("#groupListTable").bootstrapTable({
+            method: 'post',
+            contentType: "application/x-www-form-urlencoded",//必须要有！！！！
+            url: "runSignProcessList.htm",
+            height: tableHeight(),//高度调整
+            striped: true, //是否显示行间隔色
+            pageNumber: 1, //初始化加载第一页，默认第一页
+            pagination: true,//是否分页
+            queryParams: queryParams,//请求服务器时所传的参数
+            sidePagination: 'server',//指定服务器端分页
+            pageSize: 5,//单页记录数
+            pageList: [5, 10, 20, 30],//分页步进值
+            showColumns: true,//是否显示内容列下拉框
+            showRefresh: true,//是否显示刷新按钮
+            clickToSelect: true,//是否启用点击选中行
+//            toolbarAlign:'right',//工具栏对齐方式
+            buttonsAlign: 'right',//按钮对齐方式
+            locale: 'zh-CN',//中文支持,
+            columns: [
+                {
+                    title: '流程实例',
+                    field: 'processInstance',
+					hidden: true
+                },
+                {
+                    title: '签约流程号',
+                    field: 'processId'
+                },
+                {
+                    title: '会员ID',
+                    field: 'memberId'
+                },
+                {
+                    title: '状态',
+                    field: 'auditStatus'
+                },
+                {
+                    title: '申请人',
+                    field: 'applyUserId'
+                },
+                {
+                    title: '任务创建时间',
+                    field: 'taskCreateTime',
+					formatter: taskCreateTimeFormatter
+                },
+                {
+                    title: '当前节点',
+                    field: 'task',
+                    formatter: taskFormatter
+                },
+                {
+                    title: '当前处理人',
+                    field: 'assignee',
+                    formatter: taskAssigneeFormatter
+                }
+            ],
+            rowStyle: function (row, index) {
+                var classes = ['success', 'info', 'warning', 'danger'];
+                if (index % 2 === 0) {
+                    return {};
+                }
+                var eg = index % 5;
+                return {
+                    classes: classes[eg]
+                };
+            }
+        });
+    });
+
+    function taskCreateTimeFormatter(value, row, index) {
+        var task = row['task'];
+        if (task != null) {
+            return task.createTime;
+        }
+        return "";
+    }
+
+    function taskFormatter(value, row, index) {
+        var task = row['task'];
+        if (task != null) {
+            return task.name;
+        }
+        return "";
+    }
+
+    function taskAssigneeFormatter(value, row, index) {
+		var task = row['task'];
+		if (task != null) {
+			return task.assignee;
+		}
+		return "";
+    }
+
+    //请求服务数据时所传参数
+    function queryParams(params) {
+        return {
+            //每页多少条数据
+            pageSize: params.limit,
+            //请求第几页
+            pageStartIndex: params.offset
+        }
+    }
+
+    /**
+     * tableHeight函数
+     * @returns {number}
+     */
+    function tableHeight() {
+        //可以根据自己页面情况进行调整
+        return $(window).height() - 180;
+    }
+</script>
+
+</body>
+</html>

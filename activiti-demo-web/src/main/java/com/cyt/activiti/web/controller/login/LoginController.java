@@ -1,10 +1,10 @@
 package com.cyt.activiti.web.controller.login;
 
+import com.alibaba.fastjson.JSONObject;
 import com.cyt.activiti.common.enums.WebResponse;
 import com.cyt.activiti.common.utils.UserUtil;
 import com.cyt.activiti.common.utils.WebResponseUtil;
 import com.cyt.activiti.web.controller.BaseController;
-import com.meidusa.fastjson.JSONObject;
 import org.activiti.engine.IdentityService;
 import org.activiti.engine.identity.Group;
 import org.activiti.engine.identity.User;

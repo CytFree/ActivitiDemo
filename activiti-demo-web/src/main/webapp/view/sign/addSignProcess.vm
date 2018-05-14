@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>登录</title>
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="${www.contextPath}/assets/bootstrap/css/bootstrap.min.css">
+</head>
+
+<body>
+
+<!-- Top content -->
+<div class="top-content">
+
+    <div class="inner-bg">
+        <div class="container">
+            <div class="row">
+                <div class="col-sm-8 col-sm-offset-2 text">
+                    <h1><strong>Bootstrap</strong> Login Form</h1>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-6 col-sm-offset-3 form-box">
+                    <div class="form-top">
+                        <div class="form-top-left">
+                            <h3>Login to our site</h3>
+                            <p>Enter your memberId and agreementType to log on:</p>
+                        </div>
+                        <div class="form-top-right">
+                            <i class="fa fa-key"></i>
+                        </div>
+                    </div>
+                    <div class="form-bottom">
+
+                        <div class="alert alert-danger alert-dismissable" style="display: none" id="errorTip">
+                            <span id="errorMsg"></span>
+                        </div>
+
+                        <form role="form" id="addSignForm">
+                            <div class="form-group">
+                                <label class="sr-only" for="memberId">memberId</label>
+                                <input type="text" name="memberId" placeholder="会员ID..." class="memberId form-control"
+                                       id="memberId" value="$!memberId">
+                            </div>
+                            <div class="form-group">
+								<select class="form-control" name="agreementType" id="agreementType">
+                                    <option value="0">非标准</option>
+                                    <option value="1">标准</option>
+								</select>
+                            </div>
+                            <button type="button" class="btn" id="submitBtn">提交</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Javascript -->
+<script src="${www.contextPath}/assets/js/jquery-1.11.1.min.js"></script>
+<script src="${www.contextPath}/assets/bootstrap/js/bootstrap.min.js"></script>
+
+<script type="text/javascript">
+	$("#submitBtn").on("click", function () {
+        var param = $("#addSignForm").serialize();
+        $.ajax({
+            url: "saveSignProcess.htm",
+            dataType: "json",
+            type: "POST",
+            data: param,
+            success: function (data) {
+                if (data.webResponse == "SUCCESS") {
+                    alert("操作成功");
+                } else {
+                    alert(data.errorMsg);
+                }
+            }
+        });
+    });
+</script>
+
+</body>
+
+</html>

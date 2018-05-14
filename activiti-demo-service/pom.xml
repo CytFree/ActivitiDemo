@@ -12,6 +12,41 @@
     <groupId>com.cyt.activitiProjectDemo</groupId>
     <artifactId>activiti-demo-service</artifactId>
     <version>1.0-SNAPSHOT</version>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.6</source>
+                    <target>1.6</target>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 
+    <dependencies>
+        <dependency>
+            <groupId>com.cyt.activitiProjectDemo</groupId>
+            <artifactId>activiti-demo-core</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>activitiProjectDemo</groupId>
+            <artifactId>activiti-demo-facade</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
 
+        <!-- dubbo -->
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>dubbo</artifactId>
+        </dependency>
+
+        <!-- 连接zookeeper的客户端 -->
+        <dependency>
+            <groupId>com.github.sgroschupf</groupId>
+            <artifactId>zkclient</artifactId>
+        </dependency>
+    </dependencies>
 </project>

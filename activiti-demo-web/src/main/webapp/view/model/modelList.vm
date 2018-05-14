@@ -1,0 +1,68 @@
+<link rel="stylesheet" href="${www.contextPath}/assets/bootstrap/css/bootstrap.min.css">
+
+#if($message)
+<div class="alert alert-warning">
+    <a href="#" class="close" data-dismiss="alert">
+        &times;
+    </a>
+    <strong>警告！</strong>$!message
+</div>
+#end
+
+<div style="width: 95%;margin: auto; margin-top: 30px;">
+    <table class="table table-bordered">
+        <caption>Model列表</caption>
+        <tr>
+            <th>ID</th>
+            <th>KEY</th>
+            <th>Name</th>
+            <th>创建时间</th>
+            <th>最后更新时间</th>
+            <th>元数据</th>
+            <th>操作</th>
+        </tr>
+		#if($rows && $rows.size() > 0)
+			#foreach($model in $rows)
+                <tr>
+                    <td>${model.id}</td>
+                    <td>${model.key}</td>
+                    <td>${model.name}</td>
+                    <td>${model.createTime}</td>
+                    <td>${model.lastUpdateTime}</td>
+                    <td>${model.metaInfo}</td>
+                    <td>
+                        <a href="${www.contextPath}/modeler.html?modelId=${model.id}" target="_blank">编辑</a>
+                        <a href="${www.contextPath}/models/deploy/${model.id}.htm">部署</a>
+                        导出(<a href="${www.contextPath}/models/export/${model.id}/bpmn.htm" target="_blank">BPMN</a>
+                        |&nbsp;<a href="${www.contextPath}/models/export/${model.id}/json.htm" target="_blank">JSON</a>)
+                        <a href="${www.contextPath}/models/delete/${model.id}.htm">删除</a>
+                    </td>
+                </tr>
+			#end
+		#else
+            <tr>
+                <td colspan="7" align="center" style="color: red">无运行中的签约流程</td>
+            </tr>
+		#end
+    </table>
+</div>
+
+<script src="${www.contextPath}/assets/js/jquery-1.11.1.min.js"></script>
+<script src="${www.contextPath}/assets/bootstrap/js/bootstrap.min.js"></script>
+<script src="${www.contextPath}/assets/js/activiti/workflow.js"></script>
+
+
+<script type="text/javascript">
+    $(function () {
+        // 跟踪
+        $('.trace').each(function () {
+            var e = $(this);
+            var pdid = e.attr("pdid");
+            var pid = e.attr("pid");
+            var url = "http://localhost:8090/activiti-demo-web/diagram-viewer/index.html?processDefinitionId=" + pdid + "&processInstanceId=" + pid;
+            e.attr("href", url);
+        });
+    });
+
+    var ctx = "${www.contextPath}";
+</script>

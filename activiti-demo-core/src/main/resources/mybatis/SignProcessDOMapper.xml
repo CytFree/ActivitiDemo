@@ -1,0 +1,260 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cyt.activiti.core.mapper.SignProcessDOMapper">
+    <resultMap id="BaseResultMap" type="com.cyt.activiti.core.pojo.SignProcessDO">
+        <id column="process_id" property="processId" jdbcType="BIGINT"/>
+        <result column="member_id" property="memberId" jdbcType="VARCHAR"/>
+        <result column="audit_status" property="auditStatus" jdbcType="INTEGER"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
+        <result column="apply_user_id" property="applyUserId" jdbcType="VARCHAR"/>
+        <result column="agreement_type" property="agreementType" jdbcType="INTEGER"/>
+    </resultMap>
+    <sql id="Example_Where_Clause">
+        <where>
+            <foreach collection="oredCriteria" item="criteria" separator="or">
+                <if test="criteria.valid">
+                    <trim prefix="(" suffix=")" prefixOverrides="and">
+                        <foreach collection="criteria.criteria" item="criterion">
+                            <choose>
+                                <when test="criterion.noValue">
+                                    and ${criterion.condition}
+                                </when>
+                                <when test="criterion.singleValue">
+                                    and ${criterion.condition} #{criterion.value}
+                                </when>
+                                <when test="criterion.betweenValue">
+                                    and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                                </when>
+                                <when test="criterion.listValue">
+                                    and ${criterion.condition}
+                                    <foreach collection="criterion.value" item="listItem" open="(" close=")"
+                                             separator=",">
+                                        #{listItem}
+                                    </foreach>
+                                </when>
+                            </choose>
+                        </foreach>
+                    </trim>
+                </if>
+            </foreach>
+        </where>
+    </sql>
+    <sql id="Update_By_Example_Where_Clause">
+        <where>
+            <foreach collection="example.oredCriteria" item="criteria" separator="or">
+                <if test="criteria.valid">
+                    <trim prefix="(" suffix=")" prefixOverrides="and">
+                        <foreach collection="criteria.criteria" item="criterion">
+                            <choose>
+                                <when test="criterion.noValue">
+                                    and ${criterion.condition}
+                                </when>
+                                <when test="criterion.singleValue">
+                                    and ${criterion.condition} #{criterion.value}
+                                </when>
+                                <when test="criterion.betweenValue">
+                                    and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                                </when>
+                                <when test="criterion.listValue">
+                                    and ${criterion.condition}
+                                    <foreach collection="criterion.value" item="listItem" open="(" close=")"
+                                             separator=",">
+                                        #{listItem}
+                                    </foreach>
+                                </when>
+                            </choose>
+                        </foreach>
+                    </trim>
+                </if>
+            </foreach>
+        </where>
+    </sql>
+    <sql id="Base_Column_List">
+    process_id, member_id, audit_status, create_time, update_time, apply_user_id, agreement_type
+  </sql>
+    <select id="selectByExample" resultMap="BaseResultMap"
+            parameterType="com.cyt.activiti.core.pojo.SignProcessDOExample">
+        select
+        <if test="distinct">
+            distinct
+        </if>
+        <include refid="Base_Column_List"/>
+        from sign_process
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause"/>
+        </if>
+        <if test="orderByClause != null">
+            order by ${orderByClause}
+        </if>
+    </select>
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long">
+        select
+        <include refid="Base_Column_List"/>
+        from sign_process
+        where process_id = #{processId,jdbcType=BIGINT}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from sign_process
+    where process_id = #{processId,jdbcType=BIGINT}
+  </delete>
+    <delete id="deleteByExample" parameterType="com.cyt.activiti.core.pojo.SignProcessDOExample">
+        delete from sign_process
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause"/>
+        </if>
+    </delete>
+    <insert id="insert" parameterType="com.cyt.activiti.core.pojo.SignProcessDO">
+    insert into sign_process (process_id, member_id, audit_status, 
+      create_time, update_time, apply_user_id, 
+      agreement_type)
+    values (#{processId,jdbcType=BIGINT}, #{memberId,jdbcType=VARCHAR}, #{auditStatus,jdbcType=INTEGER}, 
+      #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, #{applyUserId,jdbcType=VARCHAR}, 
+      #{agreementType,jdbcType=INTEGER})
+  </insert>
+    <insert id="insertSelective" parameterType="com.cyt.activiti.core.pojo.SignProcessDO">
+        insert into sign_process
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="processId != null">
+                process_id,
+            </if>
+            <if test="memberId != null">
+                member_id,
+            </if>
+            <if test="auditStatus != null">
+                audit_status,
+            </if>
+            <if test="createTime != null">
+                create_time,
+            </if>
+            <if test="updateTime != null">
+                update_time,
+            </if>
+            <if test="applyUserId != null">
+                apply_user_id,
+            </if>
+            <if test="agreementType != null">
+                agreement_type,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="processId != null">
+                #{processId,jdbcType=BIGINT},
+            </if>
+            <if test="memberId != null">
+                #{memberId,jdbcType=VARCHAR},
+            </if>
+            <if test="auditStatus != null">
+                #{auditStatus,jdbcType=INTEGER},
+            </if>
+            <if test="createTime != null">
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="applyUserId != null">
+                #{applyUserId,jdbcType=VARCHAR},
+            </if>
+            <if test="agreementType != null">
+                #{agreementType,jdbcType=INTEGER},
+            </if>
+        </trim>
+    </insert>
+    <select id="countByExample" parameterType="com.cyt.activiti.core.pojo.SignProcessDOExample"
+            resultType="java.lang.Integer">
+        select count(*) from sign_process
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause"/>
+        </if>
+    </select>
+    <update id="updateByExampleSelective" parameterType="map">
+        update sign_process
+        <set>
+            <if test="record.processId != null">
+                process_id = #{record.processId,jdbcType=BIGINT},
+            </if>
+            <if test="record.memberId != null">
+                member_id = #{record.memberId,jdbcType=VARCHAR},
+            </if>
+            <if test="record.auditStatus != null">
+                audit_status = #{record.auditStatus,jdbcType=INTEGER},
+            </if>
+            <if test="record.createTime != null">
+                create_time = #{record.createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="record.updateTime != null">
+                update_time = #{record.updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="record.applyUserId != null">
+                apply_user_id = #{record.applyUserId,jdbcType=VARCHAR},
+            </if>
+            <if test="record.agreementType != null">
+                agreement_type = #{record.agreementType,jdbcType=INTEGER},
+            </if>
+        </set>
+        <if test="_parameter != null">
+            <include refid="Update_By_Example_Where_Clause"/>
+        </if>
+    </update>
+    <update id="updateByExample" parameterType="map">
+        update sign_process
+        set process_id = #{record.processId,jdbcType=BIGINT},
+        member_id = #{record.memberId,jdbcType=VARCHAR},
+        audit_status = #{record.auditStatus,jdbcType=INTEGER},
+        create_time = #{record.createTime,jdbcType=TIMESTAMP},
+        update_time = #{record.updateTime,jdbcType=TIMESTAMP},
+        apply_user_id = #{record.applyUserId,jdbcType=VARCHAR},
+        agreement_type = #{record.agreementType,jdbcType=INTEGER}
+        <if test="_parameter != null">
+            <include refid="Update_By_Example_Where_Clause"/>
+        </if>
+    </update>
+    <update id="updateByPrimaryKeySelective" parameterType="com.cyt.activiti.core.pojo.SignProcessDO">
+        update sign_process
+        <set>
+            <if test="memberId != null">
+                member_id = #{memberId,jdbcType=VARCHAR},
+            </if>
+            <if test="auditStatus != null">
+                audit_status = #{auditStatus,jdbcType=INTEGER},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="applyUserId != null">
+                apply_user_id = #{applyUserId,jdbcType=VARCHAR},
+            </if>
+            <if test="agreementType != null">
+                agreement_type = #{agreementType,jdbcType=INTEGER},
+            </if>
+        </set>
+        where process_id = #{processId,jdbcType=BIGINT}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.cyt.activiti.core.pojo.SignProcessDO">
+    update sign_process
+    set member_id = #{memberId,jdbcType=VARCHAR},
+      audit_status = #{auditStatus,jdbcType=INTEGER},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP},
+      apply_user_id = #{applyUserId,jdbcType=VARCHAR},
+      agreement_type = #{agreementType,jdbcType=INTEGER}
+    where process_id = #{processId,jdbcType=BIGINT}
+  </update>
+
+    <insert id="insertAndGetId" useGeneratedKeys="true" keyProperty="processId"
+            parameterType="com.cyt.activiti.core.pojo.SignProcessDO">
+        <selectKey resultType="java.lang.Long" order="AFTER" keyProperty="processId">
+            SELECT LAST_INSERT_ID() AS ID
+        </selectKey>
+        insert into sign_process (member_id, audit_status,
+        create_time, update_time, apply_user_id,
+      agreement_type)
+        values (#{memberId,jdbcType=VARCHAR}, #{auditStatus,jdbcType=INTEGER},
+        #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, #{applyUserId,jdbcType=VARCHAR},
+      #{agreementType,jdbcType=INTEGER})
+    </insert>
+</mapper>

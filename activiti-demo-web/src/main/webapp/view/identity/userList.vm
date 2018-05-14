@@ -3,9 +3,16 @@
     <link rel="stylesheet" href="${www.contextPath}/assets/bootstrap/css/bootstrap.min.css">
     <link rel="stylesheet" href="${www.contextPath}/assets/bootstrap-table/css/bootstrap-table.min.css">
 </head>
+
+<style type="text/css">
+    .groupCheckBox {
+        margin-right: 15px;
+    }
+</style>
+
 <body>
 <div id="toolBar">
-    <button class="btn btn-info" data-toggle="modal" data-target="#myModal"><span
+    <button class="btn btn-info" id="openAddUserModal" title="新增用户"><span
             class="glyphicon glyphicon-plus"></span>新增
     </button>
 </div>
@@ -15,7 +22,7 @@
     </table>
 </div>
 
-<!-- 模态框（Modal） -->
+<!-- 新增用户模态框（Modal） -->
 <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -54,6 +61,32 @@
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
                 <button type="button" class="btn btn-primary" id="addUserBtn">提交</button>
+                <button type="button" class="btn btn-primary" id="editUserBtn" style="display: none;">修改</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal -->
+</div>
+
+<!-- 设置用户组模态框（Modal） -->
+<div class="modal fade" id="setGroupModal" tabindex="-1" role="dialog" aria-labelledby="setGroupModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title" id="setGroupModalLabel">设置用户组</h4>
+            </div>
+            <div class="modal-body">
+                <form class="form-horizontal" role="form" id="setGroupForm">
+                    <input type="hidden" name="userId" id="userId" class="form-control"/>
+                    <div id="groupCheckBox" class="checkbox">
+
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                <button type="button" class="btn btn-primary" id="setGroupBtn">提交</button>
             </div>
         </div><!-- /.modal-content -->
     </div><!-- /.modal -->
@@ -66,6 +99,24 @@
 
 <script type="text/javascript">
     $(function () {
+    	$("#openAddUserModal").on("click", function () {
+			$("#myModal").modal("show");
+            $("#addUserBtn").show();
+            $("#editUserBtn").hide();
+            $("#myModalLabel").html($(this).attr("title"));
+            $("#id").removeAttr("readonly");
+        });
+
+        $('#myModal').on('hide.bs.modal', function () {
+            document.getElementById("addUserForm").reset();
+        });
+
+        $("body").delegate(".editUser","click", function(){
+            var id = $(this).attr("uid");
+            var title = $(this).attr("title");
+            editUser(id, title);
+        });
+
         //根据窗口大小调整table大小
         $(window).resize(function () {
             $('#userListTable').bootstrapTable('resetView', {
@@ -83,7 +134,7 @@
             pagination: true,//是否分页
             queryParams: queryParams,//请求服务器时所传的参数
             sidePagination: 'server',//指定服务器端分页
-            pageSize: 5,//单页记录数
+            pageSize: 10,//单页记录数
             pageList: [5, 10, 20, 30],//分页步进值
             showColumns: true,//是否显示内容列下拉框
             showRefresh: true,//是否显示刷新按钮
@@ -93,6 +144,7 @@
 //            toolbar:'#toolbar',//指定工作栏
             locale: 'zh-CN',//中文支持,
             toolbar: "#toolBar",
+            uniqueId: "id",      //每一行的唯一标识，一般为主键列
             columns: [
                 {
                     title: '用户ID',
@@ -109,7 +161,9 @@
                     field: 'email'
                 },
                 {
-                    title: '用户组'
+                    title: '用户组',
+                    field: 'groupList',
+                    formatter: groupListFormatter
                 },
                 {
                     title: '操作',
@@ -158,17 +212,109 @@
 
     function operateFormatter(value, row, index) {
         var id = row["id"];
-        var html = "<button class='btn btn-primary' onclick=editUser('" + id + "')>修改</button>";
+        var html = "<button class='btn btn-primary editUser' uid='"+ id +"' title='编辑用户' >修改</button>";
         html += "<button style='margin-left: 10px;' class='btn btn-danger' onclick=deleteUser('" + id + "')>删除</button>";
         return html;
     }
 
-    function editUser(id) {
-        alert("修改id=" + id);
+    function groupListFormatter(value, row, index) {
+        var userGroupList = row["groupList"];
+        var userId = row["id"];
+        var groupIds = [];
+        var text = "设置用户组";
+        if (userGroupList != null && userGroupList.length > 0) {
+            text = userGroupList.length + "个组【";
+            for (var j = 0; j < userGroupList.length; j++) {
+                groupIds.push(userGroupList[j].id);
+                if (j == 0) {
+                    text += userGroupList[j].name;
+                } else {
+                    text += "，" + userGroupList[j].name;
+                }
+            }
+            text += "】";
+        }
+        var html = '<button class="btn btn-info" data-value="' + userId + '" data-groupIds="' + groupIds.join(",") + '"  onclick=openSetGroupDialog(this)>';
+        html += '<span  class="glyphicon glyphicon-wrench"></span>' + text + '</button>';
+        return html;
     }
 
+    function editUser(id, title) {
+        var row = $("#userListTable").bootstrapTable('getRowByUniqueId', id);
+        $("#myModal").modal("show");
+        $("#addUserBtn").hide();
+        $("#editUserBtn").show();
+        $("#myModalLabel").html(title);
+
+        $("#id").val(row['id']);
+        $("#password").val(row['password']);
+        $("#firstName").val(row['firstName']);
+        $("#lastName").val(row['lastName']);
+        $("#email").val(row['email']);
+
+        $("#id").attr("readonly", "readonly");
+    }
+
+    /**
+     * 删除用户
+     */
     function deleteUser(id) {
-        alert("删除id=" + id);
+        $.ajax({
+            url: "deleteUser.htm",
+            dataType: "json",
+            data: {'id': id},
+            type: "POST",
+            success: function (data) {
+                if (data.webResponse == "SUCCESS") {
+                    alert("删除成功！");
+                    $("#userListTable").bootstrapTable("refresh");
+                } else {
+                    alert(data.errorMsg);
+                }
+            }
+        });
+    }
+
+    /**
+     * 打开设置用户组modal
+     */
+    function openSetGroupDialog(element) {
+        var userId = $(element).attr("data-value");
+        var groupIds = $(element).attr("data-groupIds");
+        var groupIdArr = groupIds.split(",");
+        $("#userId").val(userId);
+        $.ajax({
+            url: "allGroup.htm",
+            dataType: "json",
+            type: "POST",
+            success: function (data) {
+                if (data.webResponse == "SUCCESS") {
+                    if (data.groupList != null && data.groupList.length > 0) {
+                        var checkbox = "";
+                        for (var i = 0; i < data.groupList.length; i++) {
+                            var groupId = data.groupList[i].id;
+                            var groupName = data.groupList[i].name;
+                            var isChecked = false;
+                            for (var j = 0; j < groupIdArr.length; j++) {
+                                if (groupIdArr[j] == groupId) {
+                                    isChecked = true;
+                                    break;
+                                }
+                            }
+                            if (isChecked) {
+                                checkbox += "<label class='groupCheckBox'><input type='checkbox' name='groupIds' value='" + groupId + "' checked>" + groupName + "</label>";
+                            } else {
+                                checkbox += "<label class='groupCheckBox'><input type='checkbox' name='groupIds' value='" + groupId + "'>" + groupName + "</label>";
+                            }
+                        }
+                        $("#groupCheckBox").html(checkbox);
+                    }
+                    $("#setGroupModal").modal("show");
+                } else {
+                    alert(data.errorMsg);
+                }
+            }
+        });
     }
 
     /**
@@ -189,6 +335,57 @@
                 } else {
                     alert(data.errorMsg);
                     $("#myModal").modal("hide");
+                }
+            }
+        });
+    });
+
+    /**
+     * 提交登录表单
+     */
+    $("#editUserBtn").on("click", function () {
+        var param = $("#addUserForm").serialize();
+        $.ajax({
+            url: "updateUser.htm",
+            dataType: "json",
+            type: "POST",
+            data: param,
+            success: function (data) {
+                if (data.webResponse == "SUCCESS") {
+                    alert("用户信息修改成功");
+                    $("#myModal").modal("hide");
+                    $("#userListTable").bootstrapTable("refresh");
+                } else {
+                    alert(data.errorMsg);
+                    $("#myModal").modal("hide");
+                }
+            }
+        });
+    });
+
+    /**
+     * 提交设置用户组表单
+     */
+    $("#setGroupBtn").on("click", function () {
+        var groupIds = [];
+        $("input[name='groupIds']:checked").each(function () {
+            var checkValue = $(this).val();
+            groupIds.push(checkValue);
+        });
+        $.ajax({
+            url: "saveUserGroup.htm",
+            dataType: "json",
+            traditional: true,
+            type: "POST",
+            data: {'groupIds': groupIds, 'userId': $('#userId').val()},
+            success: function (data) {
+                if (data.webResponse == "SUCCESS") {
+                    alert("用户设置用户组成功");
+                    $("#setGroupModal").modal("hide");
+                    $("#userListTable").bootstrapTable("refresh");
+                } else {
+                    alert(data.errorMsg);
+                    $("#setGroupModal").modal("hide");
                 }
             }
         });
