@@ -35,8 +35,9 @@
         <property name="processDefinitionCacheLimit" value="10"/>
 
         <!-- 生成流程图的字体 -->
-        <property name="activityFontName" value="宋体"/>
-        <property name="labelFontName" value="宋体"/>
+        <property name="activityFontName" value="微软雅黑"/>
+        <property name="labelFontName" value="微软雅黑"/>
+        <property name="annotationFontName" value="微软雅黑"/>
 
         <!-- 自动部署 -->
         <property name="deploymentResources">

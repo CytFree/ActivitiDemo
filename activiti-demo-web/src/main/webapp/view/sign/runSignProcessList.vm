@@ -1,10 +1,6 @@
 <link rel="stylesheet" href="${www.contextPath}/assets/bootstrap/css/bootstrap.min.css">
 
 <div STYLE="margin-top: 20px;margin-left: 20px;	">
-    <a class="btn btn-info" id="addActivitiModel" title="新增Model" href="${www.contextPath}/models/newModel.htm"><span
-            class="glyphicon glyphicon-plus"></span>新增
-    </a>
-
     <a class="btn btn-info" id="startProcess" title="开启流程实例" href="javascript:void(0);"><span
             class="glyphicon glyphicon-book"></span>开启流程实例
     </a>
@@ -19,6 +15,7 @@
             <th>任务创建时间</th>
             <th>当前任务节点</th>
             <th>当前处理人</th>
+            <th>操作</th>
         </tr>
 		#if($rows && $rows.size() > 0)
 			#foreach($row in $rows)
@@ -30,8 +27,20 @@
                         <a class="trace" target="_blank" href='#' pid="$!{row.processInstanceId}"
                            pdid="$!{row.processDefinitionId}"
                            title="点击查看流程图">$!{row.taskName}</a>
-					</td>
+
+                        <a target="_blank" title="点击查看流程图"
+                           href='${www.contextPath}/diagram-test/viewImage.htm?processInstanceId=$!{row.processInstanceId}'>
+							$!{row.taskName}</a>
+                    </td>
                     <td>$!row.taskAssignee</td>
+                    <td>
+                        <a class="delete" pid="$!{row.processInstanceId}" href="javascript:void(0);">删除流程</a>
+						#if($row.taskAssignee)
+                            <a class="handle" tid='$!{row.taskId}' tname='$!{row.taskName}' href="javascript:void(0);">处理</a>
+						#else
+                            <a class="claim" href="javascript:void(0);" onclick="claim('$!{row.taskId}')">签收</a>
+						#end
+                    </td>
                 </tr>
 			#end
 		#else
@@ -46,8 +55,43 @@
 <script src="${www.contextPath}/assets/bootstrap/js/bootstrap.min.js"></script>
 <script src="${www.contextPath}/assets/js/activiti/workflow.js"></script>
 
-
 <script type="text/javascript">
+    $(".handle").on("click", function () {
+        $.ajax({
+            url: "${www.contextPath}/sign/handleTask.htm",
+            dataType: "json",
+            type: "POST",
+            data: {'taskId': $(this).attr("tid")},
+            success: function (data) {
+                if (data.webResponse == "SUCCESS") {
+                    alert("任务处理成功！");
+                    window.location.reload();
+                } else {
+                    alert(data.errorMsg);
+                }
+            }
+        });
+    });
+
+    $(".delete").on("click", function () {
+        if (confirm("确定删除吗？")) {
+            $.ajax({
+                url: "${www.contextPath}/sign/deleteProcessInstance.htm",
+                dataType: "json",
+                type: "POST",
+                data: {'processInstanceId': $(this).attr("pid")},
+                success: function (data) {
+                    if (data.webResponse == "SUCCESS") {
+                        alert("流程删除成功！");
+                        window.location.reload();
+                    } else {
+                        alert(data.errorMsg);
+                    }
+                }
+            });
+        }
+    });
+
     $(function () {
         // 跟踪
         $('.trace').each(function () {
@@ -62,25 +106,47 @@
     var ctx = "${www.contextPath}";
 
     $("#startProcess").on("click", function () {
-    	var processDefinitionKey = prompt("输入要开启的流程Key");
-		if (processDefinitionKey != null && processDefinitionKey.trim() != "") {
+        var processDefinitionKey = prompt("输入要开启的流程Key");
+        if (processDefinitionKey != null && processDefinitionKey.trim() != "") {
             processDefinitionKey = processDefinitionKey.trim();
             $.ajax({
                 url: "${www.contextPath}/models/startProcess.htm",
-                dataType:"json",
+                dataType: "json",
                 type: "POST",
                 data: {'processDefinitionKey': processDefinitionKey},
                 success: function (data) {
                     if (data.webResponse == "SUCCESS") {
-                        alert("流程【"+ processDefinitionKey +"】开始成功！");
+                        alert("流程【" + processDefinitionKey + "】开始成功！");
                     } else {
-                        alert("流程【"+ processDefinitionKey +"】开始失败！");
+                        alert("流程【" + processDefinitionKey + "】开始失败！");
                     }
                     window.location.reload();
                 }
             });
-		} else {
-			alert("流程Key不能为空");
-		}
+        } else {
+            alert("流程Key不能为空");
+        }
     });
+
+    /**
+     * 申领任务
+     *
+     * @param taskId
+     */
+    function claim(taskId) {
+        $.ajax({
+            url: "claimTask.htm",
+            dataType: "json",
+            type: "POST",
+            data: {'taskId': taskId},
+            success: function (data) {
+                if (data.webResponse == "SUCCESS") {
+                    alert("任务申领成功！");
+                    window.location.reload();
+                } else {
+                    alert(data.errorMsg);
+                }
+            }
+        });
+    }
 </script>

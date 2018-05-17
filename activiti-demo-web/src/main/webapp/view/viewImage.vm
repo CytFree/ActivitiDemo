@@ -1,0 +1,140 @@
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>Insert title here</title>
+    <link rel="stylesheet" href="${www.contextPath}/editor-app/libs/bootstrap_3.1.1/css/bootstrap.min.css">
+    <style type="text/css">
+        .activity-attr {
+            border-radius: 7px;
+            border: 3px solid red;
+            transition: ease-out 0.5s;
+            /*box-shadow: 0px 0px 9px red;*/
+        }
+
+		.popover-title {
+			font-weight: bold;
+			color: lightseagreen;
+		}
+
+		.popover-content {
+			font-family: 微软雅黑;
+			font-size: 14px;
+            color: black;
+		}
+
+        body, html {
+            margin: 0px;
+            padding: 0px;
+        }
+    </style>
+    <script src="${www.contextPath}/assets/js/jquery-1.11.1.min.js"></script>
+    <script src="${www.contextPath}/editor-app/libs/bootstrap_3.1.1/js/bootstrap.min.js"></script>
+    <script type="text/javascript">
+        $(function () {
+            $("[data-toggle='popover']").popover();
+            var processInstanceId = '$!{processInstanceId}'; // 流程实例的ID
+            var $flowImageAndRect =
+            $('#flowImageAndRect');
+            // 加载流程图片
+            loadProcessImage(processInstanceId,$flowImageAndRect);
+            // 加载各节点信息，最终实现，在点击图片上的各节点时，出现高亮
+            setTimeout(function () {
+                loadProcessTrace(processInstanceId,$flowImageAndRect);
+            }, 200);
+
+            // 上次点击的图形
+            var $revClickRect =
+            null;
+            // 绑定click事件，点击实现，只有点击的不是同一个时，才显示红色的边框（如果多次点击同一个，红色的边框只出现一次）
+            $('#flowImageAndRect').off('click').on('click', '.activity-attr', function (e) {
+                var $this =
+                $(this);
+                // 是上一个图形，避免多次点击同一个
+                var prevFlag = false;
+                // 说明不是第一次点击
+                if ($revClickRect) {
+                    // 说明2次点击的不是同一个
+                    prevFlag = ($revClickRect.attr('actId') !=$this.attr('actId')
+                )
+                            ? false : true;
+                    if (!prevFlag) {
+							$revClickRect.popover("hide");
+							$revClickRect.css('opacity','0');
+                    }
+                }
+                // 此处可以请求后台，加载相关的数据（多次点击同一个，下方可确保只执行一次）
+                if (!prevFlag) {
+                    // 显示当前的
+						$this.css('opacity','1');
+					$revClickRect= $this; // 将当前设置为上次点击的
+                }
+            });
+        });
+
+        /**
+         * 加载图片
+         */
+        function loadProcessImage(processInstanceId,$flowImageAndRect) {
+            var imageUrl = '${www.contextPath}/diagram-test/diagramView.htm?processInstanceId=' + processInstanceId;
+            // 加载图片
+            $('<img />', {
+                "src": imageUrl,
+                "alt": ''
+            }).appendTo($flowImageAndRect);
+        }
+
+        /**
+         * 加载流程中各节点的信息
+         * @param processInstanceId : 流程实例的ID
+         * @param $flowImageAndRect
+         */
+        function loadProcessTrace(processInstanceId,$flowImageAndRect) {
+            var traceUrl = '${www.contextPath}/diagram-test/getProcessTrace.htm?processInstanceId=' + processInstanceId;
+            $.getJSON(traceUrl, function (infos) {
+                var html = "";
+                $.each(infos, function (i, v) {
+                    var attr = {
+                        'actId': v.actId,
+                        'name': v.name,
+                    };
+                    if (v.type != null && v.type == "userTask") {
+                        attr = {
+                            'actId': v.actId,
+                            'name': v.name,
+                            'data-toggle': 'popover',
+							'data-html' : true,
+                            'title': '处理人/接收人',
+                            'data-content': "<p>历史处理人：<br/>" + v.handleCandidates + "</p><p>" + "任务接收人：" + v.receiveCandidates + "</p>",
+                            'data-placement': 'bottom',
+							'data-trigger': 'click'
+                        };
+                    }
+                    // 矩形的div
+                    var $div =
+                    $('<div/>', {
+                        'class': 'activity-attr'
+                    }).css({
+                        position: 'absolute',
+                        left: v.x,
+                        top: v.y,
+                        width: v.width + 2,
+                        height: v.height + 2,
+                        opacity: 0,
+                        zIndex: 100,
+                        cursor: 'pointer'
+                    }).attr(attr);
+                    html += $div.prop("outerHTML");
+                });
+                $('<div />', {'id': 'processRect'}).html(html).appendTo($flowImageAndRect);
+                $("[data-toggle='popover']").popover();
+            });
+        }
+    </script>
+</head>
+<body>
+<div id="main">
+    <div id="flowImageAndRect">
+    </div>
+</div>
+</body>
+</html>

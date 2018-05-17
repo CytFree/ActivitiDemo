@@ -206,7 +206,7 @@ public class ActivitiDemoFacadeImpl implements ActivitiDemoFacade {
      * @return
      */
     private TaskQuery createTaskQuery(ActivitiDemoQueryRequest request) {
-        TaskQuery taskQuery = taskService.createTaskQuery().active();
+        TaskQuery taskQuery = taskService.createTaskQuery().active().orderByTaskCreateTime().desc();
 
         if (StringUtils.isNotBlank(request.getRequestUserAccount())) {
             taskQuery = taskQuery.taskCandidateOrAssigned(request.getRequestUserAccount());

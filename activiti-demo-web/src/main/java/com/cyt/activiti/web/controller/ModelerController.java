@@ -8,6 +8,7 @@ package com.cyt.activiti.web.controller;
 import com.alibaba.fastjson.JSONObject;
 import com.cyt.activiti.common.utils.UserUtil;
 import com.cyt.activiti.common.utils.WebResponseUtil;
+import com.cyt.activiti.common.vo.ModelVo;
 import com.cyt.activiti.facade.ActivitiDemoFacade;
 import com.cyt.activiti.facade.enums.ResponseCode;
 import com.cyt.activiti.facade.request.ActivitiDemoRequest;
@@ -36,11 +37,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.List;
@@ -82,43 +81,42 @@ public class ModelerController extends BaseController {
      * @return
      * @throws UnsupportedEncodingException
      */
-    @RequestMapping(value = "newModel.htm", method = GET)
-    public void newModel(HttpServletRequest request, HttpServletResponse response) throws UnsupportedEncodingException {
+    @RequestMapping(value = "newModel.htm", method = POST)
+    public void newModel(HttpServletResponse response, @ModelAttribute("modelVo")ModelVo modelVo)
+            throws UnsupportedEncodingException {
+        JSONObject jsonObject;
         //初始化一个空模型
-        Model model = repositoryService.newModel();
-
-        //设置一些默认信息
-        String name = "new-process";
-        String description = "";
-        int revision = 1;
-        String key = "process";
-
-        ObjectNode modelNode = objectmapper.createObjectNode();
-        modelNode.put(ModelDataJsonConstants.MODEL_NAME, name);
-        modelNode.put(ModelDataJsonConstants.MODEL_DESCRIPTION, description);
-        modelNode.put(ModelDataJsonConstants.MODEL_REVISION, revision);
-
-        model.setName(name);
-        model.setKey(key);
-        model.setMetaInfo(modelNode.toString());
-
-        repositoryService.saveModel(model);
-        String id = model.getId();
-
-        //完善ModelEditorSource
-        ObjectNode editorNode = objectmapper.createObjectNode();
-        editorNode.put("id", "canvas");
-        editorNode.put("resourceId", "canvas");
-        ObjectNode stencilSetNode = objectmapper.createObjectNode();
-        stencilSetNode.put("namespace",
-                "http://b3mn.org/stencilset/bpmn2.0#");
-        editorNode.put("stencilset", stencilSetNode);
-        repositoryService.addModelEditorSource(id, editorNode.toString().getBytes("utf-8"));
         try {
-            response.sendRedirect(request.getContextPath() + "/modeler.html?modelId=" + id);
-        } catch (IOException e) {
+            Model model = repositoryService.newModel();
+
+            int revision = 1;
+            ObjectNode modelNode = objectmapper.createObjectNode();
+            modelNode.put(ModelDataJsonConstants.MODEL_NAME, modelVo.getModelName());
+            modelNode.put(ModelDataJsonConstants.MODEL_DESCRIPTION, modelVo.getModelDescription());
+            modelNode.put(ModelDataJsonConstants.MODEL_REVISION, revision);
+
+            model.setName(modelVo.getModelName());
+            model.setKey(modelVo.getModelKey());
+            model.setMetaInfo(modelNode.toString());
+
+            repositoryService.saveModel(model);
+            String id = model.getId();
+
+            //完善ModelEditorSource
+            ObjectNode editorNode = objectmapper.createObjectNode();
+            editorNode.put("id", "canvas");
+            editorNode.put("resourceId", "canvas");
+            ObjectNode stencilSetNode = objectmapper.createObjectNode();
+            stencilSetNode.put("namespace", "http://b3mn.org/stencilset/bpmn2.0#");
+            editorNode.put("stencilset", stencilSetNode);
+            repositoryService.addModelEditorSource(id, editorNode.toString().getBytes("utf-8"));
+
+            jsonObject = WebResponseUtil.success();
+        } catch (Exception e) {
+            jsonObject = WebResponseUtil.error();
             e.printStackTrace();
         }
+        responseJson(response, jsonObject);
     }
 
     /**
@@ -225,7 +223,7 @@ public class ModelerController extends BaseController {
                 jsonObject = WebResponseUtil.error();
             }
         } catch (Exception e) {
-            logger.error("开启流程失败, 系统异常，参数{}：", request);
+            logger.error("开启流程失败, 系统异常，参数{}：", request, e);
             jsonObject = WebResponseUtil.error();
         }
         responseJson(response, jsonObject);

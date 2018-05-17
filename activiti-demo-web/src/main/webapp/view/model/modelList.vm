@@ -1,5 +1,45 @@
 <link rel="stylesheet" href="${www.contextPath}/assets/bootstrap/css/bootstrap.min.css">
 
+<style type="text/css">
+    .glyphicon {
+        margin-right: 3px;
+    }
+</style>
+
+<div id="addActivitiModelModal" class="modal fade" tabindex="-1"
+     aria-labelledby="addActivitiModelLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title" id="addActivitiModelLabel">新增Model</h4>
+            </div>
+            <div class="modal-body">
+                <form id="addActivitiModelForm" role="form" class="form-horizontal" style="padding: 10px;">
+                    <div class="form-group">
+                        <label class="control-label" for="modelName">名称</label>
+                        <input class="form-control" name="modelName" id="modelName">
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label" for="modelKey">唯一标识</label>
+                        <input class="form-control" name="modelKey" id="modelKey">
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label" for="modelDescription">描述</label>
+                        <textarea class="form-control" name="modelDescription" id="modelDescription" rows="4">
+
+						</textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                <button type="button" class="btn btn-primary" id="saveModel">提交</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 #if($message)
 <div class="alert alert-warning">
     <a href="#" class="close" data-dismiss="alert">
@@ -8,6 +48,12 @@
     <strong>警告！</strong>$!message
 </div>
 #end
+
+<div STYLE="margin-top: 20px;margin-left: 20px;	">
+    <button class="btn btn-info" data-toggle="modal" data-target="#addActivitiModelModal">
+        <span class="glyphicon glyphicon-plus"></span>新增Model
+    </button>
+</div>
 
 <div style="width: 95%;margin: auto; margin-top: 30px;">
     <table class="table table-bordered">
@@ -49,8 +95,6 @@
 
 <script src="${www.contextPath}/assets/js/jquery-1.11.1.min.js"></script>
 <script src="${www.contextPath}/assets/bootstrap/js/bootstrap.min.js"></script>
-<script src="${www.contextPath}/assets/js/activiti/workflow.js"></script>
-
 
 <script type="text/javascript">
     $(function () {
@@ -64,5 +108,21 @@
         });
     });
 
-    var ctx = "${www.contextPath}";
+    $("#saveModel").on("click", function () {
+        var ctx = "${www.contextPath}";
+        $.ajax({
+            url: ctx + "/models/newModel.htm",
+            dataType: "json",
+            type: "POST",
+            data: $("#addActivitiModelForm").serialize(),
+            success: function (data) {
+                if (data.webResponse == "SUCCESS") {
+                    alert("Model新增成功！");
+                } else {
+                    alert("Model新增失败！");
+                }
+                window.location.reload();
+            }
+        });
+    });
 </script>

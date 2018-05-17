@@ -16,6 +16,7 @@ import org.activiti.engine.history.HistoricProcessInstance;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.Task;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -85,10 +86,14 @@ public class SignWorkFlowServiceImpl implements SignWorkFlowService {
     }
 
     @Override
-    public QueryObjResponse<WaitHandleTaskVO> queryAllRuningProcess(Integer pageStartIndex, Integer pageSize) {
+    public QueryObjResponse<WaitHandleTaskVO> queryAllRuningProcess(Integer pageStartIndex, Integer pageSize,
+                                                                    String op) {
         ActivitiDemoQueryRequest request = new ActivitiDemoQueryRequest();
         request.setPageSize(pageSize);
         request.setCurrentPage(pageStartIndex / pageSize + 1);
+        if (StringUtils.isNotBlank(op)) {
+            request.setRequestUserAccount(op);
+        }
         QueryObjResponse<WaitHandleTaskVO> response = activitiDemoFacade.waitHandleTask(request);
         if (response != null && ResponseCode.SUCCESS.getCode().equals(response.getResponseCode())) {
             return response;

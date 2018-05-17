@@ -22,7 +22,7 @@ public interface SignWorkFlowService {
      */
     void saveSignProcess(SignProcessDO signProcessDO, Map<String, Object> param);
 
-    QueryObjResponse<WaitHandleTaskVO> queryAllRuningProcess(Integer pageStartIndex, Integer pageSize);
+    QueryObjResponse<WaitHandleTaskVO> queryAllRuningProcess(Integer pageStartIndex, Integer pageSize, String op);
 
     int countRuningProcess();
 

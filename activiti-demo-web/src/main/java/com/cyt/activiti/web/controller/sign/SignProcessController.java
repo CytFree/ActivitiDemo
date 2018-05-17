@@ -11,6 +11,8 @@ import com.cyt.activiti.facade.pojo.WaitHandleTaskVO;
 import com.cyt.activiti.facade.response.QueryObjResponse;
 import com.cyt.activiti.service.sign.SignWorkFlowService;
 import com.cyt.activiti.web.controller.BaseController;
+import org.activiti.engine.RuntimeService;
+import org.activiti.engine.TaskService;
 import org.activiti.engine.identity.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -38,6 +40,12 @@ import static org.springframework.web.bind.annotation.RequestMethod.POST;
 public class SignProcessController extends BaseController {
     @Autowired
     private SignWorkFlowService signWorkFlowService;
+
+    @Autowired
+    private TaskService taskService;
+
+    @Autowired
+    private RuntimeService runtimeService;
 
     /**
      * 新增流程页面
@@ -89,9 +97,9 @@ public class SignProcessController extends BaseController {
      */
     @RequestMapping(value = "runSignProcessList.htm", method = {RequestMethod.POST, GET})
     public String runSignProcessList(@RequestParam(value = "pageStartIndex", defaultValue = "0") Integer pageStartIndex,
-                                     @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize, ModelMap modelMap) {
+                                     @RequestParam(value = "pageSize", defaultValue = "30") Integer pageSize, ModelMap modelMap) {
         try {
-            QueryObjResponse<WaitHandleTaskVO> response = signWorkFlowService.queryAllRuningProcess(pageStartIndex, pageSize);
+            QueryObjResponse<WaitHandleTaskVO> response = signWorkFlowService.queryAllRuningProcess(pageStartIndex, pageSize, null);
             if (response != null) {
                 Integer total = response.getTotalCount();
                 modelMap.put(ROW_LIST, response.getResultList());
@@ -136,11 +144,14 @@ public class SignProcessController extends BaseController {
                 return "login";
             }
 
-            List<SignProcessVO> resultList = signWorkFlowService.queryWaitHandleSignProcessList(user.getId(), pageStartIndex, pageSize);
-            int total = signWorkFlowService.countWaitHandleSignProcess(user.getId());
-
-            modelMap.put(TOTAL_SIZE, total);
-            modelMap.put(ROW_LIST, resultList);
+                QueryObjResponse<WaitHandleTaskVO> response = signWorkFlowService.queryAllRuningProcess(pageStartIndex, pageSize,
+                        user.getId());
+                if (response != null) {
+                    Integer total = response.getTotalCount();
+                    modelMap.put(ROW_LIST, response.getResultList());
+                    modelMap.put(TOTAL_SIZE, total);
+                }
+            return "sign/runSignProcessList";
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -163,14 +174,20 @@ public class SignProcessController extends BaseController {
     }
 
     @RequestMapping(value = "handleTask.htm", method = POST)
-    public void handleTask(HttpServletResponse response, String taskId,
-                           Integer auditStatus, Long processId) {
+    public void handleTask(HttpServletResponse response, String taskId) {
         JSONObject jsonObject;
         Map<String, Object> map = new HashMap<String, Object>(5);
-        map.put("auditStatus", auditStatus);
-        map.put("processId", processId);
-        signWorkFlowService.handleTask(taskId, map);
+        taskService.complete(taskId, map);
         jsonObject = WebResponseUtil.success();
         responseJson(response, jsonObject);
     }
+
+    @RequestMapping(value = "deleteProcessInstance.htm", method = POST)
+    public void deleteProcessInstance(HttpServletResponse response, String processInstanceId) {
+        JSONObject jsonObject;
+        runtimeService.deleteProcessInstance(processInstanceId, "就是想删除了");
+        jsonObject = WebResponseUtil.success();
+        responseJson(response, jsonObject);
+    }
+
 }
