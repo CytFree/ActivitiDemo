@@ -120,7 +120,7 @@ public class SignProcessController extends BaseController {
      */
     @RequestMapping(value = "completeSignProcessList.htm", method = {RequestMethod.POST, GET})
     public String completeSignProcessList(@RequestParam(value = "pageStartIndex", defaultValue = "0") Integer pageStartIndex,
-                                          @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize, ModelMap modelMap) {
+                                          @RequestParam(value = "pageSize", defaultValue = "30") Integer pageSize, ModelMap modelMap) {
         try {
             List<SignProcessVO> resultList = signWorkFlowService.queryAllCompleteProcess(pageStartIndex, pageSize);
             int total = signWorkFlowService.countCompleteProcess();
@@ -190,4 +190,17 @@ public class SignProcessController extends BaseController {
         responseJson(response, jsonObject);
     }
 
+    @RequestMapping(value = "unClaimTask.htm", method = POST)
+    public void unClaimTask(HttpServletResponse response, String taskId) {
+
+        JSONObject jsonObject;
+        try {
+            signWorkFlowService.unClaimTask(taskId);
+            jsonObject = WebResponseUtil.success();
+        } catch (Exception e) {
+            jsonObject = WebResponseUtil.error();
+            e.printStackTrace();
+        }
+        responseJson(response, jsonObject);
+    }
 }

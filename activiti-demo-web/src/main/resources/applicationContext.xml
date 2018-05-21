@@ -18,6 +18,8 @@
     <import resource="classpath:META-INF/cxf/cxf.xml"/>
     <import resource="classpath:META-INF/cxf/cxf-extension-soap.xml"/>
     <import resource="classpath:META-INF/cxf/cxf-servlet.xml"/>
+    <import resource="classpath:datasource.xml"/>
+    <import resource="classpath:datasource-user.xml"/>
     <import resource="classpath:activiti.cfg.xml"/>
     <import resource="classpath:applicationContext-dubbo.xml"/>
     <import resource="classpath:dubbo-provide.xml"/>

@@ -1,9 +1,10 @@
-package com.cyt.activiti.core.mapper;
+package com.cyt.activiti.core.mapper.activiti;
 
 import com.cyt.activiti.core.pojo.SignProcessDO;
 import com.cyt.activiti.core.pojo.SignProcessDOExample;
-import java.util.List;
 import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 public interface SignProcessDOMapper {
     int countByExample(SignProcessDOExample example);

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.cyt.activiti.core.mapper.SignProcessDOMapper">
+<mapper namespace="com.cyt.activiti.core.mapper.activiti.SignProcessDOMapper">
     <resultMap id="BaseResultMap" type="com.cyt.activiti.core.pojo.SignProcessDO">
         <id column="process_id" property="processId" jdbcType="BIGINT"/>
         <result column="member_id" property="memberId" jdbcType="VARCHAR"/>

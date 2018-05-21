@@ -37,6 +37,7 @@
                         <a class="delete" pid="$!{row.processInstanceId}" href="javascript:void(0);">删除流程</a>
 						#if($row.taskAssignee)
                             <a class="handle" tid='$!{row.taskId}' tname='$!{row.taskName}' href="javascript:void(0);">处理</a>
+                            <a class="unClaim" href="javascript:void(0);" onclick="unClaim('$!{row.taskId}')">释放</a>
 						#else
                             <a class="claim" href="javascript:void(0);" onclick="claim('$!{row.taskId}')">签收</a>
 						#end
@@ -142,6 +143,28 @@
             success: function (data) {
                 if (data.webResponse == "SUCCESS") {
                     alert("任务申领成功！");
+                    window.location.reload();
+                } else {
+                    alert(data.errorMsg);
+                }
+            }
+        });
+    }
+
+    /**
+     * 释放任务
+     *
+     * @param taskId
+     */
+    function unClaim(taskId) {
+        $.ajax({
+            url: "unClaimTask.htm",
+            dataType: "json",
+            type: "POST",
+            data: {'taskId': taskId},
+            success: function (data) {
+                if (data.webResponse == "SUCCESS") {
+                    alert("任务释放成功！");
                     window.location.reload();
                 } else {
                     alert(data.errorMsg);

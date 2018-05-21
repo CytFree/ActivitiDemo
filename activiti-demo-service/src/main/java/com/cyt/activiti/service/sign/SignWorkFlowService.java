@@ -37,4 +37,6 @@ public interface SignWorkFlowService {
     List<SignProcessVO> queryAllCompleteProcess(Integer pageStartIndex, Integer pageSize);
 
     int countCompleteProcess();
+
+    void unClaimTask(String taskId);
 }

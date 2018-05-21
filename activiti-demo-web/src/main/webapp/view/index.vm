@@ -73,6 +73,13 @@
                                onclick="gotoPage('#springUrl('/sign/waitHandleSignProcessList.htm')');">
                                 <i class="fa fa-table"></i>我的待处理</a>
                         </li>
+
+                        <li>
+                            <a href="javascript:void(0);"
+                               onclick="gotoPage('#springUrl('/sign/completeSignProcessList.htm')');">
+                                <i class="fa fa-table"></i>完成的签约流程</a>
+                        </li>
+
                         <li>
                             <a href="javascript:void(0);"
                                onclick="gotoPage('#springUrl('/models/modelList.htm')');">

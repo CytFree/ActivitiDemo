@@ -1,34 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:contenx="http://www.springframework.org/schema/context"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:schemaLocation="http://www.springframework.org/schema/beans
-       http://www.springframework.org/schema/beans/spring-beans.xsd
-       http://www.springframework.org/schema/context
-       http://www.springframework.org/schema/context/spring-context-4.2.xsd">
-
-    <contenx:property-placeholder location="classpath:jdbc.properties"/>
-
-    <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
-        <property name="url" value="${jdbc.url}"/>
-        <property name="driverClassName" value="${jdbc.driver}"/>
-        <property name="username" value="${jdbc.username}"/>
-        <property name="password" value="${jdbc.password}"/>
-        <property name="maxIdle" value="${jdbc.maxIdleTime}"/>
-        <property name="initialSize" value="${jdbc.initialSize}"/>
-        <property name="maxActive" value="${jdbc.maxActive}"/>
-    </bean>
-
-    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
-        <property name="dataSource" ref="dataSource"/>
-    </bean>
+       http://www.springframework.org/schema/beans/spring-beans.xsd">
 
     <!-- 单例json对象 -->
     <bean id="objectMapper" class="com.fasterxml.jackson.databind.ObjectMapper"/>
 
     <bean id="processEngineConfiguration" class="org.activiti.spring.SpringProcessEngineConfiguration">
-        <property name="dataSource" ref="dataSource"/>
-        <property name="transactionManager" ref="transactionManager"/>
+        <property name="dataSource">
+            <ref bean="dataSource"/>
+        </property>
+        <property name="transactionManager">
+            <ref bean="transactionManager"/>
+        </property>
 
         <!-- 自动构建数据库表，设置value="true"，第一次启动建表；设置value="drop-create"，每次启动时建新表  -->
         <property name="databaseSchemaUpdate" value="true"/>
@@ -45,6 +30,14 @@
                 <value>classpath*:/diagram/*</value>
             </list>
         </property>
+
+        <!-- 自定义用户、用户组的配置 -->
+        <property name="customSessionFactories">
+            <list>
+                <bean class="com.cyt.activiti.core.identity_ext.factory.CustomUserEntityManagerFactory"/>
+                <bean class="com.cyt.activiti.core.identity_ext.factory.CustomGroupEntityManagerFactory"/>
+            </list>
+        </property>
     </bean>
 
     <bean id="processEngine" class="org.activiti.spring.ProcessEngineFactoryBean">
@@ -59,18 +52,4 @@
     <bean id="managementService" factory-bean="processEngine" factory-method="getManagementService"/>
     <bean id="historyService" factory-bean="processEngine" factory-method="getHistoryService"/>
     <bean id="formService" factory-bean="processEngine" factory-method="getFormService"/>
-
-    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
-        <property name="dataSource" ref="dataSource" />
-        <property name="mapperLocations" value="classpath*:mybatis/*.xml" />
-    </bean>
-
-    <!-- 自动扫描mapper配置和dao映射，无需写mybatis-config.xml -->
-    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
-        <property name="basePackage" value="com.cyt.activiti.core.mapper"/>
-        <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"></property>
-    </bean>
-    <bean id="sqlSession" class="org.mybatis.spring.SqlSessionTemplate">
-        <constructor-arg index="0" ref="sqlSessionFactory"></constructor-arg>
-    </bean>
 </beans>

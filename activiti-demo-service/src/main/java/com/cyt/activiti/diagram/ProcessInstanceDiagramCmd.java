@@ -1,6 +1,5 @@
-package com.cyt.activiti.service.diagram;
+package com.cyt.activiti.diagram;
 
-import com.cyt.activiti.diagram.DefaultProcessDiagramGenerator;
 import com.google.common.collect.Lists;
 import org.activiti.bpmn.model.BpmnModel;
 import org.activiti.bpmn.model.FlowNode;
@@ -71,8 +70,17 @@ public class ProcessInstanceDiagramCmd implements Command<InputStream> {
         if (processInstance != null) {
             activeActivityIds = runtimeService.getActiveActivityIds(processInstance.getProcessInstanceId());
         } else {
-            activeActivityIds.add(historyService.createHistoricActivityInstanceQuery().processInstanceId(processInstanceId).activityType("endEvent")
-                    .singleResult().getActivityId());
+//            activeActivityIds.add(historyService.createHistoricActivityInstanceQuery().processInstanceId(processInstanceId).activityType("endEvent")
+//                    .singleResult().getActivityId());
+            /*List<HistoricActivityInstance> historicActivityInstances =
+                    historyService.createHistoricActivityInstanceQuery().processInstanceId(processInstanceId).list();
+            if (historicActivityInstances != null) {
+                for (HistoricActivityInstance historicActivityInstance : historicActivityInstances) {
+                    if ("endEvent".equals(historicActivityInstance.getActivityType())) {
+                        activeActivityIds.add(historicActivityInstance.getActivityId());
+                    }
+                }
+            }*/
         }
 
         // 使用spring注入引擎请使用下面的这行代码

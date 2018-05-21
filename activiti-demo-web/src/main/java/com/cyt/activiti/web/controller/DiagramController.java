@@ -7,6 +7,7 @@ import org.activiti.engine.IdentityService;
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.delegate.Expression;
+import org.activiti.engine.history.HistoricProcessInstance;
 import org.activiti.engine.history.HistoricTaskInstance;
 import org.activiti.engine.identity.User;
 import org.activiti.engine.impl.RepositoryServiceImpl;
@@ -94,8 +95,18 @@ public class DiagramController extends BaseController {
         List<Map<String, Object>> activityInfos = new ArrayList<Map<String, Object>>();
         try {
             ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
-            ProcessDefinition pd = repositoryService.createProcessDefinitionQuery().
-                    processDefinitionId(processInstance.getProcessDefinitionId()).singleResult();
+
+            ProcessDefinition pd;
+            if (processInstance == null) {
+                HistoricProcessInstance historicProcessInstance =
+                        historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
+                pd = repositoryService.createProcessDefinitionQuery().
+                        processDefinitionId(historicProcessInstance.getProcessDefinitionId()).singleResult();
+            } else {
+                pd = repositoryService.createProcessDefinitionQuery().
+                        processDefinitionId(processInstance.getProcessDefinitionId()).singleResult();
+            }
+
             ProcessDefinitionEntity processDefinition = (ProcessDefinitionEntity) ((RepositoryServiceImpl) repositoryService).getDeployedProcessDefinition(pd.getId());
             List<ActivityImpl> activitiList = processDefinition.getActivities();
 

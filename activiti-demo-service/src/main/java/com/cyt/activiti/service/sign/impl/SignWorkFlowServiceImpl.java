@@ -3,7 +3,7 @@ package com.cyt.activiti.service.sign.impl;
 import com.cyt.activiti.common.enums.AuditStatusEnum;
 import com.cyt.activiti.common.exception.BizServiceException;
 import com.cyt.activiti.common.vo.SignProcessVO;
-import com.cyt.activiti.core.mapper.SignProcessDOMapper;
+import com.cyt.activiti.core.mapper.activiti.SignProcessDOMapper;
 import com.cyt.activiti.core.pojo.SignProcessDO;
 import com.cyt.activiti.facade.ActivitiDemoFacade;
 import com.cyt.activiti.facade.enums.ResponseCode;
@@ -149,6 +149,11 @@ public class SignWorkFlowServiceImpl implements SignWorkFlowService {
     }
 
     @Override
+    public void unClaimTask(String taskId) {
+        taskService.unclaim(taskId);
+    }
+
+    @Override
     public void handleTask(String taskId, Map<String, Object> map) {
         Long processId = (Long) map.get("processId");
         Integer auditStatus = (Integer) map.get("auditStatus");
@@ -167,18 +172,14 @@ public class SignWorkFlowServiceImpl implements SignWorkFlowService {
 
     @Override
     public List<SignProcessVO> queryAllCompleteProcess(Integer pageStartIndex, Integer pageSize) {
-        List<HistoricProcessInstance> historicProcessInstanceList = historyService.createHistoricProcessInstanceQuery().processDefinitionKey(SIGN_PROCESS__INSTANCE_KEY)
+        List<HistoricProcessInstance> historicProcessInstanceList = historyService.createHistoricProcessInstanceQuery()
+                .finished()
+                //processDefinitionKey(SIGN_PROCESS__INSTANCE_KEY)
                 .orderByProcessInstanceEndTime().desc().listPage(pageStartIndex, pageSize);
         List<SignProcessVO> resultList = new ArrayList<SignProcessVO>();
         // 关联业务实体
         for (HistoricProcessInstance historicProcessInstance : historicProcessInstanceList) {
-            String businessKey = historicProcessInstance.getBusinessKey();
-            if (businessKey == null) {
-                continue;
-            }
-            SignProcessDO signProcessDO = signProcessDOMapper.selectByPrimaryKey(new Long(businessKey));
             SignProcessVO signProcessVO = new SignProcessVO();
-            BeanUtils.copyProperties(signProcessDO, signProcessVO);
             signProcessVO.setHistoricProcessInstance(historicProcessInstance);
             signProcessVO.setProcessDefinition(getProcessDefinition(historicProcessInstance.getProcessDefinitionId()));
             resultList.add(signProcessVO);

@@ -1,6 +1,6 @@
 package com.cyt.activiti.service.diagram.impl;
 
-import com.cyt.activiti.service.diagram.ProcessInstanceDiagramCmd;
+import com.cyt.activiti.diagram.ProcessInstanceDiagramCmd;
 import com.cyt.activiti.service.diagram.ProcessInstanceDiagramService;
 import org.activiti.engine.*;
 import org.activiti.engine.impl.interceptor.Command;
